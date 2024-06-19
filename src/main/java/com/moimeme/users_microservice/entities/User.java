@@ -8,9 +8,10 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +22,7 @@ public class User {
     private Boolean enabled;
 
     @ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinTable(name = "user_role", joinColumns = @JoinColumn(name="user_id"), inverseJoinColumns = @JoinColumn(name="role_id"))
+    @JoinTable(name = "users_roles", joinColumns = @JoinColumn(name="user_id"), inverseJoinColumns = @JoinColumn(name="role_id"))
     private List<Role> roles;
 
     public Long getUser_id() {

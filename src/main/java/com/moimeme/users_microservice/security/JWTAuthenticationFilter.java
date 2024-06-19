@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -24,7 +25,7 @@ import com.moimeme.users_microservice.entities.User;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager) {
         super();
@@ -46,6 +47,10 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             e.printStackTrace();
         } catch (IOException E) {
             E.printStackTrace();
+        }
+
+        if (user == null || user.getUsername() == null || user.getPassword() == null) {
+            throw new AuthenticationServiceException("Invalid username or password");
         }
 
         return authenticationManager.authenticate(
@@ -76,7 +81,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 withSubject(springUser.getUsername()).
                 withArrayClaim("roles", roles.toArray(new String[roles.size()])).
                 withExpiresAt(new Date(System.currentTimeMillis()+10*24*60*60*1000)).
-                sign(Algorithm.HMAC256("maxime.b2494@gmail.com"));
+                sign(Algorithm.HMAC256(SecParams.SECRET));
 
         response.addHeader("Authorization", jwt);
     }
