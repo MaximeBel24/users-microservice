@@ -28,18 +28,23 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String jwt = request.getHeader("Authorization");
+
+        System.out.println("Token JWT with Bearer                 :" + jwt);
+
         if (jwt == null || !jwt.startsWith("Bearer "))
         {
             filterChain.doFilter(request, response);
             return;
         }
-        System.out.println(jwt);
-//        System.exit(0);
 
         JWTVerifier verifier = JWT.require(Algorithm.HMAC256(SecParams.SECRET)).build();
 
+        System.out.println("Verifier token JWT                  :" + verifier);
+
         //enlever le préfixe Bearer du jwt
         jwt = jwt.substring(7); // 7 caractères dans "Bearer "
+
+        System.out.println("Token JWT without Bearer                :" + jwt);
 
         DecodedJWT decodedJWT = verifier.verify(jwt);
         String username = decodedJWT.getSubject();
@@ -48,11 +53,11 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
         Collection <GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
         for (String r : roles)
             authorities.add(new SimpleGrantedAuthority(r));
-//        System.out.println(authorities);
+        System.out.println("Authorities                         :" + authorities);
         UsernamePasswordAuthenticationToken user = new UsernamePasswordAuthenticationToken(username, null, authorities);
-//        System.out.println(user);
+        System.out.println("User                                :"+user);
         SecurityContextHolder.getContext().setAuthentication(user);
-//        System.out.println(response.getStatus());
+        System.out.println("Response status                     :"+response.getStatus());
         filterChain.doFilter(request, response);
     }
 }

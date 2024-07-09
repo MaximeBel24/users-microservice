@@ -83,6 +83,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 withExpiresAt(new Date(System.currentTimeMillis()+10*24*60*60*1000)).
                 sign(Algorithm.HMAC256(SecParams.SECRET));
 
+
         response.addHeader("Authorization", jwt);
     }
 

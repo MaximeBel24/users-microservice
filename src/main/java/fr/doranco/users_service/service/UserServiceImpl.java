@@ -79,6 +79,7 @@ public class UserServiceImpl implements UserService{
 
         newUser.setPassword(bCryptPasswordEncoder.encode(request.getPassword()));
         newUser.setEnabled(false);
+
         userRep.save(newUser);
 
         //ajouter à newUser le role par défaut USER
@@ -87,14 +88,17 @@ public class UserServiceImpl implements UserService{
         roles.add(r);
         newUser.setRoles(roles);
 
-        userRep.save(newUser);
+//        userRep.save(newUser);
 
         //génère le code secret
         String code = this.generateCode();
 
         VerificationToken token = new VerificationToken(code, newUser);
-        verificationTokenRepo.save(token);
+        System.out.print(" Code                         :" + code);
+        System.out.print(" New User                     :" + newUser);
 
+        verificationTokenRepo.save(token);
+        System.out.print(" Token JWT                     :" + token.getToken());
         sendEmailuser(newUser, code);
 
         return userRep.save(newUser);
@@ -104,21 +108,32 @@ public class UserServiceImpl implements UserService{
     public void sendEmailuser(User u, String code) {
         String emailBody = "Bonjour " + "<h1>" + u.getUsername() + "</h1>" +
                 ". Votre code de validation est " + "<h1>" + code + "</h1>";
+        System.out.print(" Username                     :" + u.getUsername());
+        System.out.print(" Code                         :" + code);
+
         emailSender.sendEmail(u.getEmail(), emailBody);
     }
 
     @Override
     public User validateToken(String code) {
         VerificationToken token = verificationTokenRepo.findByToken(code);
+
+        System.out.print(" Token JWT in validate Token                     :" + token);
+
         if(token == null){
             throw new InvalidTokenException("InvalidToken");
         }
 
         User user = token.getUser();
+
+        System.out.print("User Token                     :" + user);
+
         Calendar calendar = Calendar.getInstance();
+        System.out.print("Calendar                     :" + calendar);
+
         if((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0){
             verificationTokenRepo.delete(token);
-            throw new ExpiredTokenException("expired Token");
+            throw new ExpiredTokenException("Expired Token");
         }
         user.setEnabled(true);
         userRep.save(user);
