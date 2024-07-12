@@ -95,10 +95,8 @@ public class UserServiceImpl implements UserService{
 
         VerificationToken token = new VerificationToken(code, newUser);
         System.out.print(" Code                         :" + code);
-        System.out.print(" New User                     :" + newUser);
 
         verificationTokenRepo.save(token);
-        System.out.print(" Token JWT                     :" + token.getToken());
         sendEmailuser(newUser, code);
 
         return userRep.save(newUser);
@@ -108,17 +106,14 @@ public class UserServiceImpl implements UserService{
     public void sendEmailuser(User u, String code) {
         String emailBody = "Bonjour " + "<h1>" + u.getUsername() + "</h1>" +
                 ". Votre code de validation est " + "<h1>" + code + "</h1>";
-        System.out.print(" Username                     :" + u.getUsername());
-        System.out.print(" Code                         :" + code);
 
         emailSender.sendEmail(u.getEmail(), emailBody);
     }
 
     @Override
     public User validateToken(String code) {
-        VerificationToken token = verificationTokenRepo.findByToken(code);
 
-        System.out.print(" Token JWT in validate Token                     :" + token);
+        VerificationToken token = verificationTokenRepo.findByToken(code);
 
         if(token == null){
             throw new InvalidTokenException("InvalidToken");
@@ -126,10 +121,7 @@ public class UserServiceImpl implements UserService{
 
         User user = token.getUser();
 
-        System.out.print("User Token                     :" + user);
-
         Calendar calendar = Calendar.getInstance();
-        System.out.print("Calendar                     :" + calendar);
 
         if((token.getExpirationTime().getTime() - calendar.getTime().getTime()) <= 0){
             verificationTokenRepo.delete(token);

@@ -27,6 +27,9 @@ public class UserRestController {
 
     @GetMapping("/verifyEmail/{token}")
     public User verifyEmail(@PathVariable("token") String token){
+
+        System.out.print(" Token JWT in validate Token 1                     :" + token);
+
         return userService.validateToken(token);
     }
 }
